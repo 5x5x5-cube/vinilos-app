@@ -7,6 +7,10 @@ android {
     namespace = "com.example.vinillosapp"
     compileSdk = 35
 
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
     defaultConfig {
         applicationId = "com.example.vinillosapp"
         minSdk = 21
@@ -43,4 +47,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }
