@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-
         Log.d("activitie", navController.toString())
         val appBarConfiguration = AppBarConfiguration
             .Builder(R.id.navigation_album)
