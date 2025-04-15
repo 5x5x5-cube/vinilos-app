@@ -10,8 +10,11 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.uniandes.vinilosapp.models.Album
+import com.uniandes.vinilosapp.models.AlbumDetails
 import com.uniandes.vinilosapp.models.Collector
 import com.uniandes.vinilosapp.models.Comment
+import com.uniandes.vinilosapp.models.Performer
+import com.uniandes.vinilosapp.models.Track
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.coroutines.resume
@@ -48,49 +51,36 @@ class NetworkServiceAdapter constructor(context: Context) {
                 throw it
             }))
     }
-    fun getCollectors(  onComplete:(resp:List<Collector>)->Unit , onError: (error:VolleyError)->Unit) {
-        requestQueue.add(getRequest("collectors",
-            Response.Listener<String> { response ->
-                Log.d("tagb", response)
-                val resp = JSONArray(response)
-                val list = mutableListOf<Collector>()
-                for (i in 0 until resp.length()) {
-                    val item = resp.getJSONObject(i)
-                    list.add(i, Collector(collectorId = item.getInt("id"),name = item.getString("name"), telephone = item.getString("telephone"), email = item.getString("email")))
+
+    suspend fun getAlbum(albumId:Int) = suspendCoroutine<AlbumDetails>{ cont->
+        requestQueue.add(getRequest("albums/$albumId",
+            { response ->
+                val item = JSONObject(response)
+                val arrayPerformer = JSONArray(item.getString("performers"))
+                val arrayTracks = JSONArray(item.getString("tracks"))
+                val listperformer = mutableListOf<Performer>()
+                val listtracks = mutableListOf<Track>()
+                for (i in 0 until arrayTracks.length())
+                {
+                    val item = arrayTracks.getJSONObject(i)
+                    val track =  Track( trackId = item.getInt("id"), name = item.getString("name"), duration = item.getString("duration"))
+                    listtracks.add(i, track)
                 }
-                onComplete(list)
-            },
-            Response.ErrorListener {
-                onError(it)
-            }))
-    }
-    fun getComments( albumId:Int, onComplete:(resp:List<Comment>)->Unit , onError: (error:VolleyError)->Unit) {
-        requestQueue.add(getRequest("albums/$albumId/comments",
-            Response.Listener<String> { response ->
-                val resp = JSONArray(response)
-                val list = mutableListOf<Comment>()
-                var item:JSONObject? = null
-                for (i in 0 until resp.length()) {
-                    item = resp.getJSONObject(i)
-                    Log.d("Response", item.toString())
-                    list.add(i, Comment(albumId = albumId, rating = item.getInt("rating").toString(), description = item.getString("description")))
+                for (i in 0 until arrayPerformer.length())
+                {
+                    val item = arrayPerformer.getJSONObject(i)
+                    val perform =  Performer( performerID = item.getInt("id"), name = item.getString("name"), image = item.getString("image"), description = item.getString("description"))
+                    listperformer.add(i, perform)
                 }
-                onComplete(list)
+
+                val album = AlbumDetails(albumId = item.getInt("id"),name = item.getString("name"), cover = item.getString("cover"), recordLabel = item.getString("recordLabel"), releaseDate = item.getString("releaseDate"), genre = item.getString("genre"), description = item.getString("description"), performers = listperformer, tracks = listtracks )
+                cont.resume(album)
             },
-            Response.ErrorListener {
-                onError(it)
+            {
+                throw it
             }))
     }
-    fun postComment(body: JSONObject, albumId: Int,  onComplete:(resp:JSONObject)->Unit , onError: (error:VolleyError)->Unit){
-        requestQueue.add(postRequest("albums/$albumId/comments",
-            body,
-            Response.Listener<JSONObject> { response ->
-                onComplete(response)
-            },
-            Response.ErrorListener {
-                onError(it)
-            }))
-    }
+
     private fun getRequest(path:String, responseListener: Response.Listener<String>, errorListener: Response.ErrorListener): StringRequest {
         return StringRequest(Request.Method.GET, BASE_URL+path, responseListener,errorListener)
     }
