@@ -15,6 +15,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -33,7 +34,7 @@ fun AlbumsScreen(navController: NavController) {
     Scaffold(
             topBar = {
                 TopAppBar(
-                        title = { Text("Álbumes") },
+                        title = { Text("Álbumes", fontWeight = FontWeight.Bold) },
                         actions = {
                             IconButton(
                                     onClick = {
