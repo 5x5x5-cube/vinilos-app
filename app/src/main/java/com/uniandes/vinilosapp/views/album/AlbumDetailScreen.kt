@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -35,12 +35,17 @@ fun AlbumDetailScreen(albumId: Int, navController: NavController) {
     Scaffold(
             topBar = {
                 TopAppBar(
-                        title = { Text(text = album?.name ?: "Album Details") },
+                        title = {
+                            Text(
+                                    text = album?.name ?: "Album Details",
+                                    fontWeight = FontWeight.Bold
+                            )
+                        },
                         navigationIcon = {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
-                                        imageVector = Icons.Default.ArrowBack,
-                                        contentDescription = "Go back"
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Go back",
                                 )
                             }
                         }
@@ -75,22 +80,27 @@ fun AlbumDetailContent(album: AlbumDetails) {
             )
 
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                Text(
-                        text = "Fecha de lanzamiento: ${album.releaseDate}",
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                            text = "Fecha de lanzamiento: ",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                    )
+                    Text(text = album.releaseDate, fontSize = 14.sp)
+                }
 
-                Text(
-                        text = "Género: ${album.genre}",
-                        fontSize = 14.sp,
+                Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(vertical = 4.dp)
-                )
+                ) {
+                    Text(text = "Género: ", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(text = album.genre, fontSize = 14.sp)
+                }
 
                 Text(
                         text = "Descripción",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                 )
 
@@ -100,41 +110,66 @@ fun AlbumDetailContent(album: AlbumDetails) {
                         modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                Text(
-                        text = "Sello discográfico: ${album.recordLabel}",
-                        fontSize = 14.sp,
+                Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(vertical = 4.dp)
-                )
+                ) {
+                    Text(
+                            text = "Sello discográfico: ",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                    )
+                    Text(text = album.recordLabel, fontSize = 14.sp)
+                }
 
-                Divider(modifier = Modifier.padding(vertical = 16.dp))
+                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    Text(
+                            text = "Artistas",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                    )
+
+                    album.performers.forEach { performer ->
+                        Row(
+                                modifier =
+                                        Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AsyncImage(
+                                    model = performer.image,
+                                    contentDescription = performer.name,
+                                    modifier = Modifier.size(36.dp).padding(end = 8.dp)
+                            )
+                            Text(text = performer.name, fontSize = 14.sp)
+                        }
+                    }
+                }
 
                 Text(
                         text = "Tracks",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(top = 16.dp)
                 )
             }
         }
 
-        items(album.tracks) { track -> TrackItem(track) }
-        items(album.tracks) { track -> TrackItem(track) }
-        items(album.tracks) { track -> TrackItem(track) }
-        items(album.tracks) { track -> TrackItem(track) }
-        items(album.tracks) { track -> TrackItem(track) }
         items(album.tracks) { track -> TrackItem(track) }
     }
 }
 
 @Composable
 fun TrackItem(track: Track) {
-    Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = track.name, fontSize = 16.sp)
-        Text(text = track.duration, fontSize = 14.sp, color = Color.Gray)
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(text = track.name, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+        Text(
+                text = track.duration,
+                fontSize = 14.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 8.dp)
+        )
+        Divider(modifier = Modifier.padding(top = 8.dp))
     }
 }
 
