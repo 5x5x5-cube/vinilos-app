@@ -26,15 +26,14 @@ import com.uniandes.vinilosapp.viewmodels.AlbumDetailViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumDetailScreen(
-    albumId: Int
+    albumId: Int,
+    navController: NavController
 ) {
-    // Create ViewModel manually
     val context = LocalContext.current.applicationContext as Application
     val viewModel = remember {
         AlbumDetailViewModel(context, albumId)
     }
 
-    // Observe states
     val album = viewModel.album.observeAsState().value
     val isNetworkError = viewModel.eventNetworkError.observeAsState(false).value
 
@@ -43,7 +42,7 @@ fun AlbumDetailScreen(
             TopAppBar(
                 title = { Text(text = album?.name ?: "Album Details") },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { navController.popBackStack()  }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Go back"
@@ -79,7 +78,6 @@ fun AlbumDetailContent(album: AlbumDetails) {
         modifier = Modifier.fillMaxSize()
     ) {
         item {
-            // Album Cover Placeholder
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -87,7 +85,6 @@ fun AlbumDetailContent(album: AlbumDetails) {
                     .background(Color.LightGray),
                 contentAlignment = Alignment.Center
             ) {
-                // Placeholder for cover image
                 Icon(
                     imageVector = Icons.Default.Image,
                     contentDescription = "Album cover placeholder",
@@ -95,8 +92,6 @@ fun AlbumDetailContent(album: AlbumDetails) {
                     tint = Color.DarkGray
                 )
             }
-
-            // Album Info
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -144,7 +139,6 @@ fun AlbumDetailContent(album: AlbumDetails) {
             }
         }
 
-        // Tracks List
         items(album.tracks) { track ->
             TrackItem(track)
         }
