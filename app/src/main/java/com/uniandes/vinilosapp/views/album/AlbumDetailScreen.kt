@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -44,7 +46,7 @@ fun AlbumDetailScreen(albumId: Int, navController: NavController) {
                         navigationIcon = {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                                         contentDescription = "Go back",
                                 )
                             }
@@ -146,12 +148,24 @@ fun AlbumDetailContent(album: AlbumDetails) {
                     }
                 }
 
-                Text(
-                        text = "Tracks",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(top = 16.dp)
-                )
+                Divider(modifier = Modifier.padding(vertical = 16.dp))
+
+                Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Tracks", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+
+                    IconButton(onClick = { /* TODO: Implementar acción para agregar track */}) {
+                        Icon(
+                                imageVector = Icons.Rounded.AddCircle,
+                                contentDescription = "Añadir track",
+                                modifier = Modifier.size(36.dp),
+                                tint = Color.Black
+                        )
+                    }
+                }
             }
         }
 
