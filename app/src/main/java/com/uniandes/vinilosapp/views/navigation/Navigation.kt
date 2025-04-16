@@ -1,0 +1,57 @@
+package com.uniandes.vinilosapp.views.navigation
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.uniandes.vinilosapp.views.album.AlbumDetailScreen
+import com.uniandes.vinilosapp.views.album.AlbumsScreen
+import com.uniandes.vinilosapp.views.collector.CollectorScreen
+import com.uniandes.vinilosapp.views.performer.PerformerScreen
+
+@Composable
+fun Navigation() {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // Show tabs only on main screens, not on detail screens
+    val shouldShowTabs = currentRoute != null && !currentRoute.startsWith("albumes/")
+
+    Scaffold(
+            bottomBar = {
+                if (shouldShowTabs) {
+                    TabNavigation(navController)
+                }
+            }
+    ) { innerPadding ->
+        NavHost(
+                navController = navController,
+                startDestination = "albumes",
+                modifier = Modifier.padding(innerPadding)
+        ) {
+            // Album routes
+            composable("albumes") { AlbumsScreen(navController = navController) }
+            composable(
+                    route = "albumes/{albumId}",
+                    arguments = listOf(navArgument("albumId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val albumId = backStackEntry.arguments?.getInt("albumId") ?: 0
+                AlbumDetailScreen(albumId = albumId, navController = navController)
+            }
+
+            // Performer route (main screen only)
+            composable("performers") { PerformerScreen(navController = navController) }
+
+            // Collector route (main screen only)
+            composable("collectors") { CollectorScreen(navController = navController) }
+        }
+    }
+}

@@ -1,6 +1,5 @@
-package com.uniandes.vinilosapp.views.album
+package com.uniandes.vinilosapp.views.navigation
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Group
@@ -9,74 +8,29 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.uniandes.vinilosapp.views.collector.CollectorScreen
-import com.uniandes.vinilosapp.views.performer.PerformerScreen
 
+/**
+ * TabNavigation component that handles the bottom navigation bar for the main app routes: Albums,
+ * Artists, and Collectors
+ */
 @Composable
-fun Navigation() {
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    // Show tabs only on main screens, not on detail screens
-    val shouldShowTabs = currentRoute != null && !currentRoute.startsWith("albumDetail/")
-
-    Scaffold(
-            bottomBar = {
-                if (shouldShowTabs) {
-                    BottomTabNavigation(navController)
-                }
-            }
-    ) { innerPadding ->
-        NavHost(
-                navController = navController,
-                startDestination = "album",
-                modifier = Modifier.padding(innerPadding)
-        ) {
-            // Album routes
-            composable("album") { AlbumsScreen(navController = navController) }
-            composable(
-                    route = "albumDetail/{albumId}",
-                    arguments = listOf(navArgument("albumId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val albumId = backStackEntry.arguments?.getInt("albumId") ?: 0
-                AlbumDetailScreen(albumId = albumId, navController = navController)
-            }
-
-            // Performer route (main screen only)
-            composable("performer") { PerformerScreen(navController = navController) }
-
-            // Collector route (main screen only)
-            composable("collector") { CollectorScreen(navController = navController) }
-        }
-    }
-}
-
-@Composable
-fun BottomTabNavigation(navController: NavHostController) {
+fun TabNavigation(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(containerColor = Color.Black) {
         NavigationBarItem(
-                selected = currentDestination?.hierarchy?.any { it.route == "album" } == true,
+                selected = currentDestination?.hierarchy?.any { it.route == "albumes" } == true,
                 onClick = {
-                    navController.navigate("album") {
+                    navController.navigate("albumes") {
                         // Pop up to the start destination of the graph to avoid building up a large
                         // stack
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
@@ -99,9 +53,9 @@ fun BottomTabNavigation(navController: NavHostController) {
         )
 
         NavigationBarItem(
-                selected = currentDestination?.hierarchy?.any { it.route == "performer" } == true,
+                selected = currentDestination?.hierarchy?.any { it.route == "performers" } == true,
                 onClick = {
-                    navController.navigate("performer") {
+                    navController.navigate("performers") {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -119,9 +73,9 @@ fun BottomTabNavigation(navController: NavHostController) {
         )
 
         NavigationBarItem(
-                selected = currentDestination?.hierarchy?.any { it.route == "collector" } == true,
+                selected = currentDestination?.hierarchy?.any { it.route == "collectors" } == true,
                 onClick = {
-                    navController.navigate("collector") {
+                    navController.navigate("collectors") {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
                         restoreState = true

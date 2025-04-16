@@ -57,7 +57,7 @@ fun AlbumsScreen(navController: NavController) {
             items(albums) { album ->
                 AlbumRow(
                         album = album,
-                        onVerClick = { navController.navigate("albumDetail/${album.albumId}") }
+                        onVerClick = { navController.navigate("albumes/${album.albumId}") }
                 )
                 Divider()
             }
