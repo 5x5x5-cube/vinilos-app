@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.uniandes.vinilosapp.models.Album
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun AlbumRow(album: Album, onVerClick: () -> Unit) {
@@ -19,7 +21,6 @@ fun AlbumRow(album: Album, onVerClick: () -> Unit) {
             .padding(vertical = 8.dp),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
     ) {
-        // Portada usando AsyncImage para cargar desde la URL (usa un placeholder si la imagen tarda en cargar)
         AsyncImage(
             model = album.cover,
             contentDescription = "Portada de ${album.name}",
@@ -31,7 +32,8 @@ fun AlbumRow(album: Album, onVerClick: () -> Unit) {
             Text(text = album.name, style = MaterialTheme.typography.titleMedium)
             Text(text = album.recordLabel, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
         }
-        Button(onClick = onVerClick) {
+        Button(onClick = onVerClick, colors=ButtonDefaults.buttonColors(
+            containerColor = Color.Black)) {
             Text("Ver")
         }
     }
