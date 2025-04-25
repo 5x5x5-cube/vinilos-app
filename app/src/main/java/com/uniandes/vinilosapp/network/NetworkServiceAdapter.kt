@@ -81,6 +81,94 @@ class NetworkServiceAdapter constructor(context: Context) {
             }))
     }
 
+    suspend fun getCollectors() = suspendCoroutine<List<Collector>> { cont ->
+        val list = mutableListOf<Collector>()
+        requestQueue.add(getRequest("collectors",
+            { response ->
+                val resp = JSONArray(response)
+                for (i in 0 until resp.length()) {
+                    val item = resp.getJSONObject(i)
+                    val collector = Collector(
+                        collectorId = item.getInt("id"),
+                        name = item.getString("name"),
+                        telephone = item.getString("telephone"),
+                        email = item.getString("email")
+                    )
+                    list.add(collector)
+                }
+                cont.resume(list)
+            },
+            {
+                throw it
+            }))
+    }
+
+    suspend fun getPerformers() = suspendCoroutine<List<Performer>> { cont ->
+        val list = mutableListOf<Performer>()
+        requestQueue.add(getRequest("performers",
+            { response ->
+                val resp = JSONArray(response)
+                for (i in 0 until resp.length()) {
+                    val item = resp.getJSONObject(i)
+                    val performer = Performer(
+                        performerID = item.getInt("id"),
+                        name = item.getString("name"),
+                        image = item.getString("image"),
+                        description = item.getString("description")
+                    )
+                    list.add(performer)
+                }
+                cont.resume(list)
+            },
+            {
+                throw it
+            }))
+    }
+
+    suspend fun getMusicians() = suspendCoroutine<List<Performer>> { cont ->
+        val list = mutableListOf<Performer>()
+        requestQueue.add(getRequest("musicians",
+            { response ->
+                val resp = JSONArray(response)
+                for (i in 0 until resp.length()) {
+                    val item = resp.getJSONObject(i)
+                    val performer = Performer(
+                        performerID = item.getInt("id"),
+                        name = item.getString("name"),
+                        image = item.getString("image"),
+                        description = item.getString("description")
+                    )
+                    list.add(performer)
+                }
+                cont.resume(list)
+            },
+            {
+                throw it
+            }))
+    }
+
+    suspend fun getBands() = suspendCoroutine<List<Performer>> { cont ->
+        val list = mutableListOf<Performer>()
+        requestQueue.add(getRequest("bands",
+            { response ->
+                val resp = JSONArray(response)
+                for (i in 0 until resp.length()) {
+                    val item = resp.getJSONObject(i)
+                    val performer = Performer(
+                        performerID = item.getInt("id"),
+                        name = item.getString("name"),
+                        image = item.getString("image"),
+                        description = item.getString("description")
+                    )
+                    list.add(performer)
+                }
+                cont.resume(list)
+            },
+            {
+                throw it
+            }))
+    }
+
     private fun getRequest(path:String, responseListener: Response.Listener<String>, errorListener: Response.ErrorListener): StringRequest {
         return StringRequest(Request.Method.GET, BASE_URL+path, responseListener,errorListener)
     }
