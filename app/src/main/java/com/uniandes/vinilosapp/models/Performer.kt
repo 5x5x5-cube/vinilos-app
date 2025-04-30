@@ -1,9 +1,14 @@
 package com.uniandes.vinilosapp.models
 
-data class Performer (
-    val performerID:Int,
-    val name:String,
-    val image:String,
-    val description:String,
+enum class PerformerType {
+    MUSICIAN,
+    BAND
+}
 
-    )
+data class Performer(
+        val performerID: Int,
+        val name: String,
+        val image: String,
+        val description: String,
+        val type: PerformerType? = null
+)

@@ -22,22 +22,20 @@ fun PerformerScreen(navController: NavController) {
     val viewModel: PerformerViewModel = viewModel(factory = PerformerViewModel.Factory(application))
     val performers by viewModel.performers.observeAsState(initial = emptyList())
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Artistas", fontWeight = FontWeight.Bold) }
-            )
-        }
-    ) { innerPadding ->
+    Scaffold(topBar = { TopAppBar(title = { Text("Artistas", fontWeight = FontWeight.Bold) }) }) {
+            innerPadding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp)
         ) {
             items(performers) { performer ->
                 PerformerRow(
-                    performer = performer
+                        performer = performer,
+                        onVerClick = {
+                            val performerTypeParam = performer.type.toString()
+                            navController.navigate(
+                                    "performers/${performer.performerID}?type=$performerTypeParam"
+                            )
+                        }
                 )
                 Divider()
             }
