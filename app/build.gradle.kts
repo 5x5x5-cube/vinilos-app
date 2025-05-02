@@ -46,7 +46,7 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-    kapt("androidx.room:room-compiler:2.6.1")
+    kapt("androidx.room:room-compiler:2.7.1")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.volley)
