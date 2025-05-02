@@ -7,7 +7,7 @@ import com.uniandes.vinilosapp.models.Performer
 import com.uniandes.vinilosapp.models.PerformerType
 import com.uniandes.vinilosapp.network.NetworkServiceAdapter
 
-class PerformerRepository(application: Application) {
+class PerformerRepository(val application: Application) {
     private val networkServiceAdapter = NetworkServiceAdapter.getInstance(application)
 
     suspend fun getAllPerformers(): List<Performer> {
