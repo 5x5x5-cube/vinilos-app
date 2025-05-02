@@ -68,7 +68,7 @@ fun AlbumDetailScreen(albumId: Int, navController: NavController) {
 }
 
 @Composable
-fun AlbumDetailContent(album: AlbumDetails, navController: NavController) {
+fun AlbumDetailContent(album: AlbumDetails, navController: NavController? = null) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             AsyncImage(
@@ -144,7 +144,7 @@ fun AlbumDetailContent(album: AlbumDetails, navController: NavController) {
                                                                         "?type=${it.name}"
                                                                     }
                                                                             ?: "")
-                                                    navController.navigate(route)
+                                                    navController?.navigate(route)
                                                 }
                                                 .padding(start = 8.dp, top = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
