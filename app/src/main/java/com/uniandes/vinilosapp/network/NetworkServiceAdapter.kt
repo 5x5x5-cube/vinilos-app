@@ -173,7 +173,7 @@ class NetworkServiceAdapter constructor(context: Context) {
                                                         val item = resp.getJSONObject(i)
                                                         val collector =
                                                                 Collector(
-                                                                        collectorId =
+                                                                        collectorID =
                                                                                 item.getInt("id"),
                                                                         name =
                                                                                 item.getString(
