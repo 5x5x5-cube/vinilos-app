@@ -11,9 +11,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.uniandes.vinilosapp.models.PerformerType
 import com.uniandes.vinilosapp.views.album.AlbumDetailScreen
 import com.uniandes.vinilosapp.views.album.AlbumsScreen
 import com.uniandes.vinilosapp.views.collector.CollectorScreen
+import com.uniandes.vinilosapp.views.performer.PerformerDetailScreen
 import com.uniandes.vinilosapp.views.performer.PerformerScreen
 
 @Composable
@@ -23,7 +25,10 @@ fun Navigation() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     // Show tabs only on main screens, not on detail screens
-    val shouldShowTabs = currentRoute != null && !currentRoute.startsWith("albumes/")
+    val shouldShowTabs =
+            currentRoute != null &&
+                    !currentRoute.startsWith("albumes/") &&
+                    !currentRoute.startsWith("performers/")
 
     Scaffold(
             bottomBar = {
@@ -47,8 +52,38 @@ fun Navigation() {
                 AlbumDetailScreen(albumId = albumId, navController = navController)
             }
 
-            // Performer route (main screen only)
+            // Performer routes
             composable("performers") { PerformerScreen(navController = navController) }
+
+            // Unified performer detail route
+            composable(
+                    route = "performers/{performerId}?type={performerType}",
+                    arguments =
+                            listOf(
+                                    navArgument("performerId") { type = NavType.IntType },
+                                    navArgument("performerType") {
+                                        type = NavType.StringType
+                                        nullable = true
+                                    }
+                            )
+            ) { backStackEntry ->
+                val performerId = backStackEntry.arguments?.getInt("performerId") ?: 0
+                val performerTypeStr = backStackEntry.arguments?.getString("performerType")
+                val performerType =
+                        performerTypeStr?.let {
+                            try {
+                                PerformerType.valueOf(it)
+                            } catch (e: IllegalArgumentException) {
+                                null
+                            }
+                        }
+
+                PerformerDetailScreen(
+                        performerId = performerId,
+                        performerType = performerType,
+                        navController = navController
+                )
+            }
 
             // Collector route (main screen only)
             composable("collectors") { CollectorScreen(navController = navController) }

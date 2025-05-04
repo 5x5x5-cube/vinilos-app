@@ -1,6 +1,7 @@
 package com.uniandes.vinilosapp.views.album
 
 import android.app.Application
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -54,7 +55,7 @@ fun AlbumDetailScreen(albumId: Int, navController: NavController) {
             }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            album?.let { albumDetails -> AlbumDetailContent(albumDetails) }
+            album?.let { albumDetails -> AlbumDetailContent(albumDetails, navController) }
                     ?: run {
                         if (isNetworkError) {
                             ErrorMessage(onRetry = { viewModel.onNetworkErrorShown() })
@@ -67,7 +68,7 @@ fun AlbumDetailScreen(albumId: Int, navController: NavController) {
 }
 
 @Composable
-fun AlbumDetailContent(album: AlbumDetails) {
+fun AlbumDetailContent(album: AlbumDetails, navController: NavController? = null) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             AsyncImage(
@@ -134,7 +135,18 @@ fun AlbumDetailContent(album: AlbumDetails) {
                     album.performers.forEach { performer ->
                         Row(
                                 modifier =
-                                        Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp),
+                                        Modifier.fillMaxWidth()
+                                                .clickable {
+                                                    // Navigate to performer detail screen
+                                                    val route =
+                                                            "performers/${performer.performerID}" +
+                                                                    (performer.type?.let {
+                                                                        "?type=${it.name}"
+                                                                    }
+                                                                            ?: "")
+                                                    navController?.navigate(route)
+                                                }
+                                                .padding(start = 8.dp, top = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                         ) {
                             AsyncImage(

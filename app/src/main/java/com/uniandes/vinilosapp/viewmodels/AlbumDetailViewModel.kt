@@ -2,6 +2,7 @@ package com.uniandes.vinilosapp.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.uniandes.vinilosapp.database.VinilosDatabase
 import com.uniandes.vinilosapp.models.AlbumDetails
 import com.uniandes.vinilosapp.repositories.AlbumRepository
 import java.text.SimpleDateFormat
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AlbumDetailViewModel(application: Application, albumId: Int) : AndroidViewModel(application) {
-    private val albumsRepository = AlbumRepository(application)
+    private val albumsRepository = AlbumRepository(application, VinilosDatabase.getDatabase(application.applicationContext).albumsDao())
 
     private val _albumOriginal = MutableLiveData<AlbumDetails>()
 
