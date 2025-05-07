@@ -2,6 +2,7 @@ package com.uniandes.vinilosapp.views.performer
 
 import android.app.Application
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.*
@@ -53,7 +54,9 @@ fun PerformerDetailScreen(
             },
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            performer?.let { performerDetails -> PerformerDetailContent(performerDetails) }
+            performer?.let { performerDetails: Performer ->
+                PerformerDetailContent(performerDetails)
+            }
                     ?: run {
                         if (isNetworkError) {
                             ErrorMessage(onRetry = { viewModel.onNetworkErrorShown() })
@@ -67,32 +70,37 @@ fun PerformerDetailScreen(
 
 @Composable
 fun PerformerDetailContent(performer: Performer) {
-    Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+    LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AsyncImage(
-                model = performer.image,
-                contentDescription = "Imagen de ${performer.name}",
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                contentScale = ContentScale.FillWidth
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-            Text(
-                    text = "Descripcion",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+        item {
+            AsyncImage(
+                    model = performer.image,
+                    contentDescription = "Imagen de ${performer.name}",
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    contentScale = ContentScale.FillWidth
             )
 
-            Text(
-                    text = performer.description,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                        text = "Descripcion",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Text(
+                        text = performer.description,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
         }
     }
 }
