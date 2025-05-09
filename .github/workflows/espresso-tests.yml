@@ -7,7 +7,7 @@ on:
 jobs:
   espresso-test:
     name: Run Espresso Tests
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -25,5 +25,12 @@ jobs:
       - name: Grant execution permission for Gradlew
         run: chmod +x ./gradlew
 
-      - name: Run instrumented tests (Espresso)
-        run: ./gradlew connectedDebugAndroidTest
+      - name: Run instrumented tests on Emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86
+          profile: Nexus 6
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: ./gradlew connectedDebugAndroidTest
