@@ -11,13 +11,16 @@ import com.uniandes.vinilosapp.models.Album
 import com.uniandes.vinilosapp.models.AlbumDetails
 import com.uniandes.vinilosapp.models.Band
 import com.uniandes.vinilosapp.models.Collector
+import com.uniandes.vinilosapp.models.GENRE
 import com.uniandes.vinilosapp.models.Musician
 import com.uniandes.vinilosapp.models.Performer
+import com.uniandes.vinilosapp.models.RECORD_LABEL
 import com.uniandes.vinilosapp.models.Track
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.coroutines.resumeWithException
 
 class NetworkServiceAdapter constructor(context: Context) {
         companion object {
@@ -48,30 +51,12 @@ class NetworkServiceAdapter constructor(context: Context) {
                                                         val album =
                                                                 Album(
                                                                         albumId = item.getInt("id"),
-                                                                        name =
-                                                                                item.getString(
-                                                                                        "name"
-                                                                                ),
-                                                                        cover =
-                                                                                item.getString(
-                                                                                        "cover"
-                                                                                ),
-                                                                        recordLabel =
-                                                                                item.getString(
-                                                                                        "recordLabel"
-                                                                                ),
-                                                                        releaseDate =
-                                                                                item.getString(
-                                                                                        "releaseDate"
-                                                                                ),
-                                                                        genre =
-                                                                                item.getString(
-                                                                                        "genre"
-                                                                                ),
-                                                                        description =
-                                                                                item.getString(
-                                                                                        "description"
-                                                                                )
+                                                                        name = item.getString("name"),
+                                                                        cover = item.getString("cover"),
+                                                                        recordLabel = RECORD_LABEL.fromString(item.getString("recordLabel")),
+                                                                        releaseDate = item.getString("releaseDate"),
+                                                                        genre = GENRE.fromString(item.getString("genre")),
+                                                                        description = item.getString("description")
                                                                 )
                                                         list.add(i, album)
                                                 }
@@ -407,6 +392,40 @@ class NetworkServiceAdapter constructor(context: Context) {
                                                 cont.resume(band)
                                         },
                                         { throw it }
+                                )
+                        )
+                }
+
+        suspend fun createAlbum(album: Album) =
+                suspendCoroutine<Album> { cont ->
+                        val body = JSONObject().apply {
+                                put("name", album.name)
+                                put("cover", album.cover)
+                                put("releaseDate", album.releaseDate)
+                                put("description", album.description)
+                                put("genre", album.genre.toString())
+                                put("recordLabel", album.recordLabel.toString())
+                        }
+                        
+                        requestQueue.add(
+                                postRequest(
+                                        "albums",
+                                        body,
+                                        { response ->
+                                                val album = Album(
+                                                        albumId = response.getInt("id"),
+                                                        name = response.getString("name"),
+                                                        cover = response.getString("cover"),
+                                                        recordLabel = RECORD_LABEL.fromString(response.getString("recordLabel")),
+                                                        releaseDate = response.getString("releaseDate"),
+                                                        genre = GENRE.fromString(response.getString("genre")),
+                                                        description = response.getString("description")
+                                                )
+                                                cont.resume(album)
+                                        },
+                                        { error -> 
+                                                cont.resumeWithException(error)
+                                        }
                                 )
                         )
                 }

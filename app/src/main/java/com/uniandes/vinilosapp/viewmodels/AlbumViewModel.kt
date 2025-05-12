@@ -9,16 +9,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.uniandes.vinilosapp.database.VinilosDatabase
 import com.uniandes.vinilosapp.models.Album
-import com.uniandes.vinilosapp.network.NetworkServiceAdapter
 import com.uniandes.vinilosapp.repositories.AlbumRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AlbumViewModel(application: Application) :  AndroidViewModel(application) {
+class AlbumViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _albums = MutableLiveData<List<Album>>()
-    private val albumsRepository = AlbumRepository(application, VinilosDatabase.getDatabase(application.applicationContext).albumsDao())
+    private val albumsRepository =
+            AlbumRepository(
+                    application,
+                    VinilosDatabase.getDatabase(application.applicationContext).albumsDao()
+            )
 
     val albums: LiveData<List<Album>>
         get() = _albums
@@ -33,23 +36,36 @@ class AlbumViewModel(application: Application) :  AndroidViewModel(application) 
     val isNetworkErrorShown: LiveData<Boolean>
         get() = _isNetworkErrorShown
 
+    // Add loading state
+    private var _isLoading = MutableLiveData<Boolean>(false)
+
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     init {
+        refreshData()
+    }
+
+    // Public method to manually refresh albums list
+    fun refreshAlbums() {
         refreshData()
     }
 
     private fun refreshData() {
         try {
-            viewModelScope.launch(Dispatchers.Default){
-                withContext(Dispatchers.IO){
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.Default) {
+                withContext(Dispatchers.IO) {
                     var data = albumsRepository.getAlbums()
                     _albums.postValue(data)
                 }
                 _eventNetworkError.postValue(false)
                 _isNetworkErrorShown.postValue(false)
+                _isLoading.postValue(false)
             }
-        }
-        catch (e:Exception){
+        } catch (e: Exception) {
             _eventNetworkError.value = true
+            _isLoading.value = false
         }
     }
 
@@ -59,13 +75,9 @@ class AlbumViewModel(application: Application) :  AndroidViewModel(application) 
     class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AlbumViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return AlbumViewModel(app) as T
+                @Suppress("UNCHECKED_CAST") return AlbumViewModel(app) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
-
-
-
 }
