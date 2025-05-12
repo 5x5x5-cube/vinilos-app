@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.uniandes.vinilosapp.models.PerformerType
 import com.uniandes.vinilosapp.views.album.AlbumDetailScreen
 import com.uniandes.vinilosapp.views.album.AlbumsScreen
+import com.uniandes.vinilosapp.views.album.CreateAlbumScreen
 import com.uniandes.vinilosapp.views.collector.CollectorScreen
 import com.uniandes.vinilosapp.views.performer.PerformerDetailScreen
 import com.uniandes.vinilosapp.views.performer.PerformerScreen
@@ -28,6 +29,7 @@ fun Navigation() {
     val shouldShowTabs =
             currentRoute != null &&
                     !currentRoute.startsWith("albumes/") &&
+                    !currentRoute.equals("crear-album") &&
                     !currentRoute.startsWith("performers/")
 
     Scaffold(
@@ -44,6 +46,7 @@ fun Navigation() {
         ) {
             // Album routes
             composable("albumes") { AlbumsScreen(navController = navController) }
+            composable("albumes/create") { CreateAlbumScreen(navController = navController) }
             composable(
                     route = "albumes/{albumId}",
                     arguments = listOf(navArgument("albumId") { type = NavType.IntType })

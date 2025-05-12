@@ -36,11 +36,7 @@ fun AlbumsScreen(navController: NavController) {
                 TopAppBar(
                         title = { Text("Álbumes", fontWeight = FontWeight.Bold) },
                         actions = {
-                            IconButton(
-                                    onClick = {
-                                        // pendiente la creacion de un album.
-                                    }
-                            ) {
+                            IconButton(onClick = { navController.navigate("albumes/create") }) {
                                 Icon(
                                         imageVector = Icons.Rounded.AddCircle,
                                         contentDescription = "Agregar álbum",
