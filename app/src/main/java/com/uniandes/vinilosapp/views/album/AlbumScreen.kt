@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -30,6 +31,22 @@ fun AlbumsScreen(navController: NavController) {
     val albumViewModel: AlbumViewModel = viewModel(factory = AlbumViewModel.Factory(application))
 
     val albums by albumViewModel.albums.observeAsState(initial = emptyList())
+
+    // Check if we need to refresh albums when navigating back from CreateAlbumScreen
+    LaunchedEffect(Unit) {
+        // Get the refresh flag from the SavedStateHandle
+        val needsRefresh =
+                navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>(
+                        "refresh_albums"
+                )
+                        ?: false
+
+        // If the flag is set, refresh albums and reset the flag
+        if (needsRefresh) {
+            albumViewModel.refreshAlbums()
+            navController.currentBackStackEntry?.savedStateHandle?.set("refresh_albums", false)
+        }
+    }
 
     Scaffold(
             topBar = {

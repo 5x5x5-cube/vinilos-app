@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -124,12 +125,23 @@ fun CreateAlbumScreen(navController: NavController) {
     LaunchedEffect(createSuccess, error) {
         if (createSuccess) {
             Toast.makeText(context, "Álbum creado exitosamente", Toast.LENGTH_SHORT).show()
+            // Set a refresh flag in the backstack entry for AlbumsScreen to detect
+            navController.previousBackStackEntry?.savedStateHandle?.set("refresh_albums", true)
             navController.navigateUp()
         }
 
         error?.let { errorMsg ->
             Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
             viewModel.resetState()
+        }
+    }
+
+    // Ensure the refresh flag is set when we return to the AlbumsScreen
+    DisposableEffect(Unit) {
+        onDispose {
+            if (createSuccess) {
+                navController.previousBackStackEntry?.savedStateHandle?.set("refresh_albums", true)
+            }
         }
     }
 
