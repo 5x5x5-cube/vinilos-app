@@ -36,6 +36,12 @@ class AlbumViewModel(application: Application) : AndroidViewModel(application) {
     val isNetworkErrorShown: LiveData<Boolean>
         get() = _isNetworkErrorShown
 
+    // Add loading state
+    private var _isLoading = MutableLiveData<Boolean>(false)
+
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     init {
         refreshData()
     }
@@ -47,6 +53,7 @@ class AlbumViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun refreshData() {
         try {
+            _isLoading.value = true
             viewModelScope.launch(Dispatchers.Default) {
                 withContext(Dispatchers.IO) {
                     var data = albumsRepository.getAlbums()
@@ -54,9 +61,11 @@ class AlbumViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 _eventNetworkError.postValue(false)
                 _isNetworkErrorShown.postValue(false)
+                _isLoading.postValue(false)
             }
         } catch (e: Exception) {
             _eventNetworkError.value = true
+            _isLoading.value = false
         }
     }
 
