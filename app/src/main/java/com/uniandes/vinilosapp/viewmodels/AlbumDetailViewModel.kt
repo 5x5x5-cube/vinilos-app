@@ -12,7 +12,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AlbumDetailViewModel(application: Application, albumId: Int) : AndroidViewModel(application) {
-    private val albumsRepository = AlbumRepository(application, VinilosDatabase.getDatabase(application.applicationContext).albumsDao())
+    private val albumsRepository =
+            AlbumRepository(
+                    application,
+                    VinilosDatabase.getDatabase(application.applicationContext).albumsDao()
+            )
 
     private val _albumOriginal = MutableLiveData<AlbumDetails>()
 
@@ -60,7 +64,7 @@ class AlbumDetailViewModel(application: Application, albumId: Int) : AndroidView
         }
     }
 
-    private fun refreshData() {
+    fun refreshData() {
         try {
             viewModelScope.launch(Dispatchers.Default) {
                 withContext(Dispatchers.IO) {
