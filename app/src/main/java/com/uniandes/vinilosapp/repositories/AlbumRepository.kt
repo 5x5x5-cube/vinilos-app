@@ -7,6 +7,7 @@ import android.net.NetworkCapabilities
 import com.uniandes.vinilosapp.database.AlbumDao
 import com.uniandes.vinilosapp.models.Album
 import com.uniandes.vinilosapp.models.AlbumDetails
+import com.uniandes.vinilosapp.models.Track
 import com.uniandes.vinilosapp.network.NetworkServiceAdapter
 
 class AlbumRepository(val application: Application, private val albumDao: AlbumDao) {
@@ -49,5 +50,22 @@ class AlbumRepository(val application: Application, private val albumDao: AlbumD
         albumDao.clearAll()
 
         return createdAlbum
+    }
+
+    suspend fun createTrack(albumId: Int, name: String, duration: String): Track {
+        val cm =
+                application.baseContext.getSystemService(Context.CONNECTIVITY_SERVICE) as
+                        ConnectivityManager
+
+        val activeNetwork = cm.activeNetwork
+        val capabilities = cm.getNetworkCapabilities(activeNetwork)
+        val isConnected =
+                capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+
+        if (!isConnected) {
+            throw Exception("No internet connection available")
+        }
+
+        return NetworkServiceAdapter.getInstance(application).createTrack(albumId, name, duration)
     }
 }
