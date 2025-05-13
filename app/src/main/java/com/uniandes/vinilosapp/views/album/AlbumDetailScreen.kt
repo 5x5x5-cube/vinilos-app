@@ -34,6 +34,24 @@ fun AlbumDetailScreen(albumId: Int, navController: NavController) {
     val album = viewModel.album.observeAsState().value
     val isNetworkError = viewModel.eventNetworkError.observeAsState(false).value
 
+    // Observer for refresh flag from AddTrackScreen
+    val refreshTrigger =
+            navController
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.getLiveData<Boolean>("refresh_album", false)
+                    ?.observeAsState(false)
+                    ?.value
+                    ?: false
+
+    // Refresh data when coming back from AddTrackScreen with refresh flag
+    LaunchedEffect(refreshTrigger) {
+        if (refreshTrigger) {
+            viewModel.refreshData()
+            navController.currentBackStackEntry?.savedStateHandle?.set("refresh_album", false)
+        }
+    }
+
     Scaffold(
             topBar = {
                 TopAppBar(
@@ -168,7 +186,13 @@ fun AlbumDetailContent(album: AlbumDetails, navController: NavController? = null
                 ) {
                     Text(text = "Tracks", fontWeight = FontWeight.Bold, fontSize = 24.sp)
 
-                    IconButton(onClick = { /* TODO: Implementar acción para agregar track */}) {
+                    IconButton(
+                            onClick = {
+                                navController?.navigate(
+                                        "albumes/${album.albumId}/add-track?albumName=${album.name}"
+                                )
+                            }
+                    ) {
                         Icon(
                                 imageVector = Icons.Rounded.AddCircle,
                                 contentDescription = "Añadir track",

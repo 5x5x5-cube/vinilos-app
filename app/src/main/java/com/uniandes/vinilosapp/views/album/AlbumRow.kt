@@ -30,7 +30,7 @@ fun AlbumRow(album: Album, onVerClick: () -> Unit) {
         )
         Column(modifier = Modifier.weight(1f)) {
             Text(text = album.name, style = MaterialTheme.typography.titleMedium)
-            Text(text = album.recordLabel, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = album.recordLabel.toString(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
         }
         Button(onClick = onVerClick, colors=ButtonDefaults.buttonColors(
             containerColor = Color.Black)) {
