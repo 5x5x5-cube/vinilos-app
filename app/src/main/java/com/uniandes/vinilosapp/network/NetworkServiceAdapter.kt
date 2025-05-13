@@ -11,6 +11,7 @@ import com.uniandes.vinilosapp.models.Album
 import com.uniandes.vinilosapp.models.AlbumDetails
 import com.uniandes.vinilosapp.models.Band
 import com.uniandes.vinilosapp.models.Collector
+import com.uniandes.vinilosapp.models.CollectorDetails
 import com.uniandes.vinilosapp.models.GENRE
 import com.uniandes.vinilosapp.models.Musician
 import com.uniandes.vinilosapp.models.Performer
@@ -205,6 +206,27 @@ class NetworkServiceAdapter constructor(context: Context) {
                         )
                 }
 
+        suspend fun getCollector(collectorId:Int) = suspendCoroutine<CollectorDetails>{ cont->
+                requestQueue.add(getRequest("collectors/$collectorId",
+                        { response ->
+                                val item = JSONObject(response)
+                                val arrayPerformer = JSONArray(item.getString("favoritePerformers"))
+                                val listperformer = mutableListOf<Performer>()
+                                for (i in 0 until arrayPerformer.length())
+                                {
+                                        val item = arrayPerformer.getJSONObject(i)
+                                        val perform =  Performer( performerID = item.getInt("id"), name = item.getString("name"), image = item.getString("image"), description = item.getString("description"))
+                                        listperformer.add(i, perform)
+                                }
+
+                                val collector = CollectorDetails(collectorID = item.getInt("id"),name = item.getString("name"), telephone = item.getString("telephone"), email = item.getString("email"), performers = listperformer )
+                                cont.resume(collector)
+                        },
+                        {
+                                throw it
+                        }))
+        }
+
         suspend fun getPerformers() =
                 suspendCoroutine<List<Performer>> { cont ->
                         val list = mutableListOf<Performer>()
@@ -240,6 +262,8 @@ class NetworkServiceAdapter constructor(context: Context) {
                                 )
                         )
                 }
+
+
 
         suspend fun getMusicians() =
                 suspendCoroutine<List<Performer>> { cont ->

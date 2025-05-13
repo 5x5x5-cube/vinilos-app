@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import com.uniandes.vinilosapp.database.CollectorDao
 import com.uniandes.vinilosapp.models.Collector
+import com.uniandes.vinilosapp.models.CollectorDetails
 import com.uniandes.vinilosapp.network.NetworkServiceAdapter
 
 class CollectorRepository (val application: Application, private val collectorsDao: CollectorDao){
@@ -18,6 +19,11 @@ class CollectorRepository (val application: Application, private val collectorsD
                 emptyList()
             } else NetworkServiceAdapter.getInstance(application).getCollectors()
         } else cached
+    }
+
+    suspend fun getCollectorDetail(collectorId: Int): CollectorDetails{
+
+        return NetworkServiceAdapter.getInstance(application).getCollector(collectorId)
     }
 
 }

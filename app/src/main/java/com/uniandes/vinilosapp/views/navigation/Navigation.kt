@@ -16,6 +16,7 @@ import com.uniandes.vinilosapp.views.album.AddTrackScreen
 import com.uniandes.vinilosapp.views.album.AlbumDetailScreen
 import com.uniandes.vinilosapp.views.album.AlbumsScreen
 import com.uniandes.vinilosapp.views.album.CreateAlbumScreen
+import com.uniandes.vinilosapp.views.collector.CollectorDetailScreen
 import com.uniandes.vinilosapp.views.collector.CollectorScreen
 import com.uniandes.vinilosapp.views.performer.PerformerDetailScreen
 import com.uniandes.vinilosapp.views.performer.PerformerScreen
@@ -112,6 +113,13 @@ fun Navigation() {
 
             // Collector route (main screen only)
             composable("collectors") { CollectorScreen(navController = navController) }
+            composable(
+                route = "collectors/{collectorId}",
+                arguments = listOf(navArgument("collectorId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val collectorId = backStackEntry.arguments?.getInt("collectorId") ?: 0
+                CollectorDetailScreen(collectorId = collectorId, navController = navController)
+            }
         }
     }
 }
