@@ -37,7 +37,12 @@ fun CollectorScreen(navController: NavController) {
         ) {
             items(collectors) { collector ->
                 CollectorRow(
-                    collector = collector
+                    collector = collector,
+                    onVerClick = {
+                        navController.navigate(
+                            "collectors/${collector.collectorID}"
+                        )
+                    }
                 )
                 Divider()
             }
