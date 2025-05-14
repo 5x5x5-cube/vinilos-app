@@ -392,6 +392,16 @@ class CreateAlbumViewModel(application: Application) : AndroidViewModel(applicat
         _genreTouched.value = false
         _recordLabelTouched.value = false
         _releaseDateTouched.value = false
+
+        if (_releaseDate.value == null) {
+            val yesterday = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_MONTH, -1)
+            }.time
+
+            _releaseDate.value = yesterday
+            val displayFormat = SimpleDateFormat("dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+            _releaseDateFormatted.value = displayFormat.format(yesterday)
+        }
     }
 
     class Factory(val app: Application) : ViewModelProvider.Factory {
