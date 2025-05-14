@@ -1,6 +1,7 @@
 package com.uniandes.vinilosapp
 
 import androidx.compose.ui.test.*
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.uniandes.vinilosapp.views.MainActivity
