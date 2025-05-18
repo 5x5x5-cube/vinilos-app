@@ -11,10 +11,14 @@ import com.uniandes.vinilosapp.models.Album
 import com.uniandes.vinilosapp.models.AlbumDetails
 import com.uniandes.vinilosapp.models.Band
 import com.uniandes.vinilosapp.models.Collector
+import com.uniandes.vinilosapp.models.CollectorDetails
+import com.uniandes.vinilosapp.models.GENRE
 import com.uniandes.vinilosapp.models.Musician
 import com.uniandes.vinilosapp.models.Performer
+import com.uniandes.vinilosapp.models.RECORD_LABEL
 import com.uniandes.vinilosapp.models.Track
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import org.json.JSONArray
 import org.json.JSONObject
@@ -57,16 +61,21 @@ class NetworkServiceAdapter constructor(context: Context) {
                                                                                         "cover"
                                                                                 ),
                                                                         recordLabel =
-                                                                                item.getString(
-                                                                                        "recordLabel"
-                                                                                ),
+                                                                                RECORD_LABEL
+                                                                                        .fromString(
+                                                                                                item.getString(
+                                                                                                        "recordLabel"
+                                                                                                )
+                                                                                        ),
                                                                         releaseDate =
                                                                                 item.getString(
                                                                                         "releaseDate"
                                                                                 ),
                                                                         genre =
-                                                                                item.getString(
-                                                                                        "genre"
+                                                                                GENRE.fromString(
+                                                                                        item.getString(
+                                                                                                "genre"
+                                                                                        )
                                                                                 ),
                                                                         description =
                                                                                 item.getString(
@@ -191,6 +200,56 @@ class NetworkServiceAdapter constructor(context: Context) {
                                                         list.add(collector)
                                                 }
                                                 cont.resume(list)
+                                        },
+                                        { throw it }
+                                )
+                        )
+                }
+
+        suspend fun getCollector(collectorId: Int) =
+                suspendCoroutine<CollectorDetails> { cont ->
+                        requestQueue.add(
+                                getRequest(
+                                        "collectors/$collectorId",
+                                        { response ->
+                                                val item = JSONObject(response)
+                                                val arrayPerformer =
+                                                        JSONArray(
+                                                                item.getString("favoritePerformers")
+                                                        )
+                                                val listperformer = mutableListOf<Performer>()
+                                                for (i in 0 until arrayPerformer.length()) {
+                                                        val item = arrayPerformer.getJSONObject(i)
+                                                        val perform =
+                                                                Performer(
+                                                                        performerID =
+                                                                                item.getInt("id"),
+                                                                        name =
+                                                                                item.getString(
+                                                                                        "name"
+                                                                                ),
+                                                                        image =
+                                                                                item.getString(
+                                                                                        "image"
+                                                                                ),
+                                                                        description =
+                                                                                item.getString(
+                                                                                        "description"
+                                                                                )
+                                                                )
+                                                        listperformer.add(i, perform)
+                                                }
+
+                                                val collector =
+                                                        CollectorDetails(
+                                                                collectorID = item.getInt("id"),
+                                                                name = item.getString("name"),
+                                                                telephone =
+                                                                        item.getString("telephone"),
+                                                                email = item.getString("email"),
+                                                                performers = listperformer
+                                                        )
+                                                cont.resume(collector)
                                         },
                                         { throw it }
                                 )
@@ -407,6 +466,85 @@ class NetworkServiceAdapter constructor(context: Context) {
                                                 cont.resume(band)
                                         },
                                         { throw it }
+                                )
+                        )
+                }
+
+        suspend fun createAlbum(album: Album) =
+                suspendCoroutine<Album> { cont ->
+                        val body =
+                                JSONObject().apply {
+                                        put("name", album.name)
+                                        put("cover", album.cover)
+                                        put("releaseDate", album.releaseDate)
+                                        put("description", album.description)
+                                        put("genre", album.genre.toString())
+                                        put("recordLabel", album.recordLabel.toString())
+                                }
+
+                        requestQueue.add(
+                                postRequest(
+                                        "albums",
+                                        body,
+                                        { response ->
+                                                val album =
+                                                        Album(
+                                                                albumId = response.getInt("id"),
+                                                                name = response.getString("name"),
+                                                                cover = response.getString("cover"),
+                                                                recordLabel =
+                                                                        RECORD_LABEL.fromString(
+                                                                                response.getString(
+                                                                                        "recordLabel"
+                                                                                )
+                                                                        ),
+                                                                releaseDate =
+                                                                        response.getString(
+                                                                                "releaseDate"
+                                                                        ),
+                                                                genre =
+                                                                        GENRE.fromString(
+                                                                                response.getString(
+                                                                                        "genre"
+                                                                                )
+                                                                        ),
+                                                                description =
+                                                                        response.getString(
+                                                                                "description"
+                                                                        )
+                                                        )
+                                                cont.resume(album)
+                                        },
+                                        { error -> cont.resumeWithException(error) }
+                                )
+                        )
+                }
+
+        suspend fun createTrack(albumId: Int, name: String, duration: String) =
+                suspendCoroutine<Track> { cont ->
+                        val body =
+                                JSONObject().apply {
+                                        put("name", name)
+                                        put("duration", duration)
+                                }
+
+                        requestQueue.add(
+                                postRequest(
+                                        "albums/$albumId/tracks",
+                                        body,
+                                        { response ->
+                                                val track =
+                                                        Track(
+                                                                trackId = response.getInt("id"),
+                                                                name = response.getString("name"),
+                                                                duration =
+                                                                        response.getString(
+                                                                                "duration"
+                                                                        )
+                                                        )
+                                                cont.resume(track)
+                                        },
+                                        { error -> cont.resumeWithException(error) }
                                 )
                         )
                 }

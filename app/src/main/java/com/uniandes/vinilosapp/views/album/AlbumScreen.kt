@@ -1,6 +1,7 @@
 package com.uniandes.vinilosapp.views.album
 
 import android.app.Application
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -10,8 +11,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -30,17 +33,30 @@ fun AlbumsScreen(navController: NavController) {
     val albumViewModel: AlbumViewModel = viewModel(factory = AlbumViewModel.Factory(application))
 
     val albums by albumViewModel.albums.observeAsState(initial = emptyList())
+    val isLoading = albumViewModel.isLoading.observeAsState(initial = false)
+
+    // Check if we need to refresh albums when navigating back from CreateAlbumScreen
+    LaunchedEffect(Unit) {
+        // Get the refresh flag from the SavedStateHandle
+        val needsRefresh =
+                navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>(
+                        "refresh_albums"
+                )
+                        ?: false
+
+        // If the flag is set, refresh albums and reset the flag
+        if (needsRefresh) {
+            albumViewModel.refreshAlbums()
+            navController.currentBackStackEntry?.savedStateHandle?.set("refresh_albums", false)
+        }
+    }
 
     Scaffold(
             topBar = {
                 TopAppBar(
                         title = { Text("Álbumes", fontWeight = FontWeight.Bold) },
                         actions = {
-                            IconButton(
-                                    onClick = {
-                                        // pendiente la creacion de un album.
-                                    }
-                            ) {
+                            IconButton(onClick = { navController.navigate("albumes/create") }) {
                                 Icon(
                                         imageVector = Icons.Rounded.AddCircle,
                                         contentDescription = "Agregar álbum",
@@ -52,15 +68,25 @@ fun AlbumsScreen(navController: NavController) {
                 )
             }
     ) { innerPadding ->
-        LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp)
+        Box(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentAlignment = Alignment.Center
         ) {
-            items(albums) { album ->
-                AlbumRow(
-                        album = album,
-                        onVerClick = { navController.navigate("albumes/${album.albumId}") }
+            if (isLoading.value) {
+                CircularProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        color = MaterialTheme.colorScheme.secondary
                 )
-                Divider()
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                    items(albums) { album ->
+                        AlbumRow(
+                                album = album,
+                                onVerClick = { navController.navigate("albumes/${album.albumId}") }
+                        )
+                        HorizontalDivider()
+                    }
+                }
             }
         }
     }
