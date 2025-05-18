@@ -23,21 +23,17 @@ fun CollectorScreen(navController: NavController) {
     val collectors by viewModel.collectors.observeAsState(initial = emptyList())
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Coleccionistas", fontWeight = FontWeight.Bold) }
-            )
-        }
+            topBar = { TopAppBar(title = { Text("Coleccionistas", fontWeight = FontWeight.Bold) }) }
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp)
         ) {
             items(collectors) { collector ->
                 CollectorRow(
-                    collector = collector
+                        collector = collector,
+                        onVerClick = {
+                            navController.navigate("collectors/${collector.collectorID}")
+                        }
                 )
                 Divider()
             }

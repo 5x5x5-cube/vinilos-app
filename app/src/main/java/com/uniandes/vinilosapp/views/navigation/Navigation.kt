@@ -12,8 +12,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.uniandes.vinilosapp.models.PerformerType
+import com.uniandes.vinilosapp.views.album.AddTrackScreen
 import com.uniandes.vinilosapp.views.album.AlbumDetailScreen
 import com.uniandes.vinilosapp.views.album.AlbumsScreen
+import com.uniandes.vinilosapp.views.album.CreateAlbumScreen
+import com.uniandes.vinilosapp.views.collector.CollectorDetailScreen
 import com.uniandes.vinilosapp.views.collector.CollectorScreen
 import com.uniandes.vinilosapp.views.performer.PerformerDetailScreen
 import com.uniandes.vinilosapp.views.performer.PerformerScreen
@@ -28,6 +31,7 @@ fun Navigation() {
     val shouldShowTabs =
             currentRoute != null &&
                     !currentRoute.startsWith("albumes/") &&
+                    !currentRoute.equals("collectors/") &&
                     !currentRoute.startsWith("performers/")
 
     Scaffold(
@@ -44,12 +48,34 @@ fun Navigation() {
         ) {
             // Album routes
             composable("albumes") { AlbumsScreen(navController = navController) }
+            composable("albumes/create") { CreateAlbumScreen(navController = navController) }
             composable(
                     route = "albumes/{albumId}",
                     arguments = listOf(navArgument("albumId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val albumId = backStackEntry.arguments?.getInt("albumId") ?: 0
                 AlbumDetailScreen(albumId = albumId, navController = navController)
+            }
+
+            // Add Track route
+            composable(
+                    route = "albumes/{albumId}/add-track?albumName={albumName}",
+                    arguments =
+                            listOf(
+                                    navArgument("albumId") { type = NavType.IntType },
+                                    navArgument("albumName") {
+                                        type = NavType.StringType
+                                        nullable = true
+                                    }
+                            )
+            ) { backStackEntry ->
+                val albumId = backStackEntry.arguments?.getInt("albumId") ?: 0
+                val albumName = backStackEntry.arguments?.getString("albumName") ?: ""
+                AddTrackScreen(
+                        albumId = albumId,
+                        albumName = albumName,
+                        navController = navController
+                )
             }
 
             // Performer routes
@@ -87,6 +113,13 @@ fun Navigation() {
 
             // Collector route (main screen only)
             composable("collectors") { CollectorScreen(navController = navController) }
+            composable(
+                    route = "collectors/{collectorId}",
+                    arguments = listOf(navArgument("collectorId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val collectorId = backStackEntry.arguments?.getInt("collectorId") ?: 0
+                CollectorDetailScreen(collectorId = collectorId, navController = navController)
+            }
         }
     }
 }
